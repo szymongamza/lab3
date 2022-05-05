@@ -2,13 +2,13 @@ import java.util.ArrayList;
 
 class GroupManager {
     private ArrayList<String> names;
-    private ArrayList<Integer> numbersOfStudents;
+    private ArrayList<StudentManager> studentsList;
     private ArrayList<Integer> maxesNumberOfStudents;
 
 
     public GroupManager() {
         names = new ArrayList();
-        numbersOfStudents = new ArrayList();
+        studentsList = new ArrayList();
         maxesNumberOfStudents = new ArrayList();
     }
 
@@ -17,27 +17,19 @@ class GroupManager {
         names.add(index, name);
     }
 
-
-    public void setNumberOfStudents(int index, Integer number) {
-        numbersOfStudents.remove(index);
-        numbersOfStudents.add(index, number);
-    }
-
     public void setMaxNumberOfStudents(int index, Integer maxNumber) {
         maxesNumberOfStudents.remove(index);
         maxesNumberOfStudents.add(index, maxNumber);
     }
 
-    public void addGroup(String name, Integer number, Integer maxNumber) {
+    public void addGroup(String name, Integer maxNumber) {
         names.add(name);
-        numbersOfStudents.add(number);
         maxesNumberOfStudents.add(maxNumber);
 
     }
 
     public void deleteGroup(int index) {
         names.remove(index);
-        numbersOfStudents.remove(index);
         maxesNumberOfStudents.remove(index);
 
     }
@@ -46,10 +38,15 @@ class GroupManager {
         return names.get(index);
 
     }
-    public Integer getNumberOfStudents(int index) {
-        return numbersOfStudents.get(index);
 
+    public StudentManager getListOfStudents(int index){
+        return studentsList.get(index);
     }
+
+    public int getNumberOfStudents(int index){
+        return studentsList.size();
+    }
+
     public Integer getMaxNumberOfStudents(int index) {
         return maxesNumberOfStudents.get(index);
 

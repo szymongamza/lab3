@@ -6,7 +6,7 @@ class GroupTableModel extends AbstractTableModel {
 
     public GroupTableModel() {
         groupManager = new GroupManager();
-        groupManager.addGroup("1", 0, 1);
+        groupManager.addGroup("Pierwsza", 10);
     }
 
     public Object getValueAt(int r, int c) {
@@ -15,7 +15,7 @@ class GroupTableModel extends AbstractTableModel {
         } else if (c == 1) {
             return groupManager.getNumberOfStudents(r);
         } else if (c == 2) {
-            return groupManager.getNumberOfStudents(r);
+            return groupManager.getMaxNumberOfStudents(r);
         }
         return null;
     }
@@ -32,26 +32,19 @@ class GroupTableModel extends AbstractTableModel {
         return cols[c];
     }
 
-    public void setValueAt(Object value, int r, int c) {
-        if (c == 0) {
-            groupManager.setGroupName(r, (String) value);
-        } else if (c == 1) {
-            groupManager.setNumberOfStudents(r, (Integer) value);
-        } else if (c == 2) {
-            groupManager.setMaxNumberOfStudents(r, (Integer) value);
-        }
-        fireTableCellUpdated(r, c);
-    }
     public boolean isCellEditable(int r,int c){
-        return true;
+        return false;
     }
 
     public void newGroup(){
-        groupManager.addGroup("Name Here", 0, 2);
+        groupManager.addGroup("Name Here", 2);
         fireTableDataChanged();
     }
     public void deleteGroup(int index){
         groupManager.deleteGroup(index);
         fireTableDataChanged();
+    }
+    public StudentManager getGroup(int index){
+        return groupManager.getListOfStudents(index);
     }
 }

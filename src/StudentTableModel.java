@@ -6,7 +6,7 @@ class StudentTableModel extends AbstractTableModel {
 
     public StudentTableModel() {
         studentManager = new StudentManager();
-        studentManager.addStudent("Szymon", "Gamza", 20.0);
+        studentManager.addStudent("a","a",1.0);
     }
 
     public Object getValueAt(int r, int c) {
@@ -52,6 +52,11 @@ class StudentTableModel extends AbstractTableModel {
     }
     public void deleteStudent(int index){
         studentManager.deleteStudent(index);
+        fireTableDataChanged();
+    }
+
+    public void updateTable(StudentManager s){
+        studentManager = s;
         fireTableDataChanged();
     }
 }
