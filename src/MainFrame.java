@@ -1,28 +1,35 @@
 import Students.StudentCondition;
 
-import java.awt.*;
 import javax.swing.*;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import java.awt.*;
 import java.awt.event.*;
 
 public class MainFrame extends JFrame implements ActionListener {
-    private JFrame jFrame;
-    private StudentTableModel studentTableModel;
-    private GroupTableModel groupTableModel;
-    private JTable studentTable, groupTable;
-    private JScrollPane studentPane, groupPane;
-    private JButton jButtonNewStudent, jButtonDeleteStudent, jButtonEditStudent, jButtonNewGroup, jButtonDeleteGroup, jButtonEditGroup, jButtonSort;
-    private TableRowSorter tableRowSorter;
-    private JTextField jtextField;
+    private final JFrame jFrame;
+    private final StudentTableModel studentTableModel;
+    private final GroupTableModel groupTableModel;
+    private final JTable studentTable;
+    private final JTable groupTable;
+    private final JScrollPane studentPane;
+    private final JScrollPane groupPane;
+    private final JButton jButtonNewStudent;
+    private final JButton jButtonDeleteStudent;
+    private final JButton jButtonEditStudent;
+    private final JButton jButtonNewGroup;
+    private final JButton jButtonDeleteGroup;
+    private final JButton jButtonEditGroup;
+    private final JButton jButtonSort;
+    private final TableRowSorter tableRowSorter;
+    private final JTextField jtextField;
+    private final JComboBox jComboBox;
 
     public MainFrame() {
         jFrame = new JFrame("StudentTable");
-        //jFrame.setPreferredSize((new Dimension(1100, 600)));
+
         jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jFrame.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-
 
 
         groupTableModel = new GroupTableModel();
@@ -36,14 +43,14 @@ public class MainFrame extends JFrame implements ActionListener {
             }
         });
 
-        //groupTable.setPreferredScrollableViewportSize(new Dimension(450, 300));
+
         groupTable.setAutoCreateRowSorter(true);
         groupPane = new JScrollPane(groupTable);
 
         studentTableModel = new StudentTableModel();
         studentTable = new JTable(studentTableModel);
 
-        //studentTable.setPreferredScrollableViewportSize(new Dimension(450, 300));
+
         studentPane = new JScrollPane(studentTable);
 
         tableRowSorter = new TableRowSorter<StudentTableModel>(studentTableModel);
@@ -71,18 +78,33 @@ public class MainFrame extends JFrame implements ActionListener {
         jButtonDeleteStudent.addActionListener(this);
 
         jtextField = new JTextField();
-        //jtextField.setPreferredSize(new Dimension(800,25));
         jtextField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == 10){
+                if (e.getKeyCode() == 10) {
                     String query = jtextField.getText();
                     filter(query);
                 }
             }
         });
+
+        jComboBox = new JComboBox<StudentCondition>(StudentCondition.values());
+        jComboBox.insertItemAt("", 0);
+        jComboBox.setSelectedIndex(0);
+        jComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getItem() != "") {
+                    filter(String.valueOf(e.getItem()));
+                } else {
+                    filter("");
+                }
+
+            }
+        });
+
         c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(5,5,5,5);
+        c.insets = new Insets(5, 5, 5, 5);
         c.gridwidth = 3;
         c.gridx = 0;
         c.gridy = 0;
@@ -97,12 +119,20 @@ public class MainFrame extends JFrame implements ActionListener {
 
 
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.weightx = 1;
+        c.weightx = 0.9;
         c.weighty = 0.01;
-        c.gridwidth = 7;
+        c.gridwidth = 6;
         c.gridx = 0;
         c.gridy = 1;
-        jFrame.getContentPane().add(jtextField,c);
+        jFrame.getContentPane().add(jtextField, c);
+
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.1;
+        c.weighty = 0.01;
+        c.gridwidth = 1;
+        c.gridx = 6;
+        c.gridy = 1;
+        jFrame.getContentPane().add(jComboBox, c);
 
 
         c.anchor = GridBagConstraints.PAGE_END;
@@ -141,52 +171,112 @@ public class MainFrame extends JFrame implements ActionListener {
         jFrame.pack();
 
 
-
     }
-    private void filter(String query){
+
+    private void filter(String query) {
         tableRowSorter.setRowFilter(RowFilter.regexFilter(query));
+    }
+
+    private double inputPoints() {
+        while (true) {
+            try {
+                String input = JOptionPane.showInputDialog(jFrame, "Enter Student Points:");
+                double a = Double.parseDouble(input);
+                return a;
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(null, "Input must be a number");
+            }
+        }
+    }
+
+    private int inputMaxStudents() {
+
+        while (true) {
+            try {
+                String input = JOptionPane.showInputDialog(jFrame, "Enter max number of students in group:");
+                int a = Integer.parseInt(input);
+                if (a <= 0) {
+                    throw new IncorrectNumberException("Incorrect number!");
+                }
+                return a;
+            } catch (NumberFormatException nfe) {
+                JOptionPane.showMessageDialog(null, "Input must be a number!");
+            } catch (IncorrectNumberException ine) {
+                JOptionPane.showMessageDialog(null, "Input must be a number higher than 0!");
+            }
+        }
     }
 
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        try {
         if (e.getActionCommand().equals(("New Student"))) {
-            int max = Integer.parseInt((groupTableModel.getValueAt(groupTable.getSelectedRow(), 2)).toString());
-            int students = Integer.parseInt((groupTableModel.getValueAt(groupTable.getSelectedRow(), 1)).toString());
-            if (students < max) {
+            try {
+                int max = Integer.parseInt((groupTableModel.getValueAt(groupTable.getSelectedRow(), 2)).toString());
+                int students = Integer.parseInt((groupTableModel.getValueAt(groupTable.getSelectedRow(), 1)).toString());
+                if (students < max) {
+                    String studentName = JOptionPane.showInputDialog(jFrame, "Enter Student Name:");
+                    String studentSurname = JOptionPane.showInputDialog(jFrame, "Enter Student Surname:");
+                    double studentPoints = inputPoints();
+                    StudentCondition[] choices = StudentCondition.values();
+                    String studentCondition = JOptionPane.showInputDialog(jFrame, "Choose Condition", null, JOptionPane.QUESTION_MESSAGE, null, choices, choices[1]).toString();
+                    studentTableModel.newStudent(studentName, studentSurname, StudentCondition.valueOf(studentCondition), studentPoints);
+                }
+            }catch(IndexOutOfBoundsException ioobe){
+                JOptionPane.showMessageDialog(null, "You must select group first!");
+            }
+
+        } else if (e.getActionCommand().equals("Delete Student")) {
+            if(studentTable.getSelectedRow() >= 0) {
+                studentTableModel.deleteStudent(studentTable.getSelectedRow());
+            }else{
+                JOptionPane.showMessageDialog(null, "You have to select student to delete him");
+            }
+
+        } else if (e.getActionCommand().equals("Edit Student")) {
+            if(studentTable.getSelectedRow() >= 0) {
                 String studentName = JOptionPane.showInputDialog(jFrame, "Enter Student Name:");
                 String studentSurname = JOptionPane.showInputDialog(jFrame, "Enter Student Surname:");
-                String studentPoints = JOptionPane.showInputDialog(jFrame, "Enter Student Points:");
+                double studentPoints = inputPoints();
                 StudentCondition[] choices = StudentCondition.values();
                 String studentCondition = JOptionPane.showInputDialog(jFrame, "Choose Condition", null, JOptionPane.QUESTION_MESSAGE, null, choices, choices[1]).toString();
-                studentTableModel.newStudent(studentName, studentSurname, StudentCondition.valueOf(studentCondition), Double.parseDouble(studentPoints));
+                studentTableModel.setValueAt(studentName, studentTable.getSelectedRow(), 0);
+                studentTableModel.setValueAt(studentSurname, studentTable.getSelectedRow(), 1);
+                studentTableModel.setValueAt(StudentCondition.valueOf(studentCondition), studentTable.getSelectedRow(), 2);
+                studentTableModel.setValueAt(studentPoints, studentTable.getSelectedRow(), 3);
+            }else{
+                JOptionPane.showMessageDialog(null, "You have to select student to edit him");
             }
-        } else if (e.getActionCommand().equals("Delete Student")) {
-            studentTableModel.deleteStudent(studentTable.getSelectedRow());
-        } else if (e.getActionCommand().equals("Edit Student")) {
-            String studentName = JOptionPane.showInputDialog(jFrame, "Enter Student Name:");
-            String studentSurname = JOptionPane.showInputDialog(jFrame, "Enter Student Surname:");
-            String studentPoints = JOptionPane.showInputDialog(jFrame, "Enter Student Points:");
-            StudentCondition[] choices = StudentCondition.values();
-            String studentCondition = JOptionPane.showInputDialog(jFrame, "Choose Condition", null, JOptionPane.QUESTION_MESSAGE, null, choices, choices[1]).toString();
-            studentTableModel.setValueAt(studentName, studentTable.getSelectedRow(), 0);
-            studentTableModel.setValueAt(studentSurname, studentTable.getSelectedRow(), 1);
-            studentTableModel.setValueAt(StudentCondition.valueOf(studentCondition), studentTable.getSelectedRow(), 2);
-            studentTableModel.setValueAt(Double.parseDouble(studentPoints), studentTable.getSelectedRow(), 3);
+
         } else if (e.getActionCommand().equals("New Group")) {
             String groupName = JOptionPane.showInputDialog(jFrame, "Enter Group Name:");
-            String groupMaxStudents = JOptionPane.showInputDialog(jFrame, "Enter max number of students in group:");
-            groupTableModel.newGroup(groupName, Integer.parseInt(groupMaxStudents));
+            int groupMaxStudents = inputMaxStudents();
+            groupTableModel.newGroup(groupName, groupMaxStudents);
+
         } else if (e.getActionCommand().equals("Delete Group")) {
-            groupTableModel.deleteGroup(groupTable.getSelectedRow());
+            if(groupTable.getSelectedRow() >= 0) {
+                groupTableModel.deleteGroup(groupTable.getSelectedRow());
+            }else{
+                JOptionPane.showMessageDialog(null, "You have to select group to delete it");
+            }
+
         } else if (e.getActionCommand().equals("Edit Group")) {
-            String groupName = JOptionPane.showInputDialog(jFrame, "Enter Group Name:");
-            String groupMaxStudents = JOptionPane.showInputDialog(jFrame, "Enter max number of students in group:");
-            groupTableModel.setValueAt(groupName, groupTable.getSelectedRow(), 0);
-            groupTableModel.setValueAt(Integer.parseInt(groupMaxStudents), groupTable.getSelectedRow(), 2);
+            if(groupTable.getSelectedRow() >= 0) {
+                String groupName = JOptionPane.showInputDialog(jFrame, "Enter Group Name:");
+                int groupMaxStudents = inputMaxStudents();
+                groupTableModel.setValueAt(groupName, groupTable.getSelectedRow(), 0);
+                groupTableModel.setValueAt(groupMaxStudents, groupTable.getSelectedRow(), 2);
+            }else{
+                JOptionPane.showMessageDialog(null, "You have to select group to edit it");
+            }
+
         } else if (e.getActionCommand().equals("Sort")) {
             studentTable.getRowSorter().toggleSortOrder(3);
         }
+    }catch(IndexOutOfBoundsException indexOutOfBoundsException){
+        JOptionPane.showMessageDialog(null, "Something went wrong ;)");
+    }
     }
 }
 
