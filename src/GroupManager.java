@@ -24,6 +24,7 @@ class GroupManager {
 
     public void addGroup(String name, Integer maxNumber) {
         names.add(name);
+        studentsList.add(new StudentManager());
         maxesNumberOfStudents.add(maxNumber);
 
     }
@@ -39,12 +40,13 @@ class GroupManager {
 
     }
 
-    public StudentManager getListOfStudents(int index){
+    public StudentManager getListOfStudents(int index) {
         return studentsList.get(index);
     }
 
-    public int getNumberOfStudents(int index){
-        return studentsList.size();
+    public int getNumberOfStudents(int index) {
+        StudentManager a = getListOfStudents(index);
+        return a.size();
     }
 
     public Integer getMaxNumberOfStudents(int index) {
@@ -52,7 +54,7 @@ class GroupManager {
 
     }
 
-    public int size(){
+    public int size() {
         return names.size();
     }
 

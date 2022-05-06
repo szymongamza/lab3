@@ -1,12 +1,13 @@
+import Students.StudentCondition;
+
 import javax.swing.table.AbstractTableModel;
 
 class StudentTableModel extends AbstractTableModel {
-    private String[] cols = {"Name", "Surname", "Points"};
+    private String[] cols = {"Name", "Surname", "Condition", "Points"};
     StudentManager studentManager;
 
     public StudentTableModel() {
         studentManager = new StudentManager();
-        studentManager.addStudent("a","a",1.0);
     }
 
     public Object getValueAt(int r, int c) {
@@ -15,13 +16,15 @@ class StudentTableModel extends AbstractTableModel {
         } else if (c == 1) {
             return studentManager.getStudentSurname(r);
         } else if (c == 2) {
+            return studentManager.getStudentCondition(r);
+        } else if (c == 3) {
             return studentManager.getStudentPoint(r);
         }
         return null;
     }
 
     public int getColumnCount() {
-        return 3;
+        return 4;
     }
 
     public int getRowCount() {
@@ -38,24 +41,28 @@ class StudentTableModel extends AbstractTableModel {
         } else if (c == 1) {
             studentManager.setStudentSurname(r, (String) value);
         } else if (c == 2) {
+            studentManager.setStudentCondition(r, (StudentCondition) value);
+        } else if (c == 3) {
             studentManager.setStudentPoints(r, (Double) value);
         }
         fireTableCellUpdated(r, c);
     }
-    public boolean isCellEditable(int r,int c){
-        return true;
+
+    public boolean isCellEditable(int r, int c) {
+        return false;
     }
 
-    public void newStudent(){
-        studentManager.addStudent("Name Here", "Surname Here", 10.0);
+    public void newStudent(String name, String surname, StudentCondition condition, Double points) {
+        studentManager.addStudent(name, surname, condition, points);
         fireTableDataChanged();
     }
-    public void deleteStudent(int index){
+
+    public void deleteStudent(int index) {
         studentManager.deleteStudent(index);
         fireTableDataChanged();
     }
 
-    public void updateTable(StudentManager s){
+    public void updateTable(StudentManager s) {
         studentManager = s;
         fireTableDataChanged();
     }
